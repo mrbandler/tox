@@ -31,14 +31,40 @@ option(TOX_BUILD_SHARED "Build shared library" ON)
 option(TOX_BUILD_STATIC "Build static library" ON)
 option(TOX_BUILD_BINARY "Build standalone executable" ON)
 
-# Library source files (everything except main.cpp)
-set(TOX_LIB_SOURCES
-    src/tox.cpp
+# Third-party dependencies
+include(FetchContent)
+
+# magic_enum - Enum reflection (used by library)
+FetchContent_Declare(
+    magic_enum
+    GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+    GIT_TAG        v0.9.6
 )
 
-# Public headers
-set(TOX_PUBLIC_HEADERS
-    include/tox.h
+FetchContent_MakeAvailable(magic_enum)
+
+# CLI11 - Command line argument parser (binary only)
+if(TOX_BUILD_BINARY)
+    FetchContent_Declare(
+        cli11
+        GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+        GIT_TAG        v2.4.2
+    )
+
+    FetchContent_MakeAvailable(cli11)
+endif()
+
+# Library source files (auto-detect all .cpp files except main.cpp)
+file(GLOB_RECURSE TOX_LIB_SOURCES
+    CONFIGURE_DEPENDS
+    "src/*.cpp"
+)
+list(FILTER TOX_LIB_SOURCES EXCLUDE REGEX ".*main\\.cpp$")
+
+# Public headers (auto-detect)
+file(GLOB_RECURSE TOX_PUBLIC_HEADERS
+    CONFIGURE_DEPENDS
+    "include/*.h" "include/*.hpp"
 )
 
 # Shared library
@@ -57,6 +83,7 @@ if(TOX_BUILD_SHARED)
         PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+    target_link_libraries(tox_shared PUBLIC magic_enum::magic_enum)
 
     # Export symbols on Windows
     if(WIN32)
@@ -79,6 +106,7 @@ if(TOX_BUILD_STATIC)
         PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+    target_link_libraries(tox_static PUBLIC magic_enum::magic_enum)
 endif()
 
 # Main executable
@@ -87,9 +115,9 @@ if(TOX_BUILD_BINARY)
 
     # Link against static library by default
     if(TOX_BUILD_STATIC)
-        target_link_libraries(tox PRIVATE tox_static)
+        target_link_libraries(tox PRIVATE tox_static CLI11::CLI11)
     elseif(TOX_BUILD_SHARED)
-        target_link_libraries(tox PRIVATE tox_shared)
+        target_link_libraries(tox PRIVATE tox_shared CLI11::CLI11)
     else()
         # Fallback: compile sources directly into executable
         target_sources(tox PRIVATE ${TOX_LIB_SOURCES})
@@ -97,6 +125,7 @@ if(TOX_BUILD_BINARY)
             ${CMAKE_CURRENT_SOURCE_DIR}/include
             ${CMAKE_CURRENT_SOURCE_DIR}/src
         )
+        target_link_libraries(tox PRIVATE magic_enum::magic_enum CLI11::CLI11)
     endif()
 endif()
 
