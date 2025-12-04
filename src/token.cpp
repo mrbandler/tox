@@ -3,7 +3,7 @@
 #include <format>
 #include <magic_enum.hpp>
 
-Token::Token(TokenType type, std::string lexeme, Literal literal, int line)
+Token::Token(TokenType type, std::string lexeme, Literal literal, std::size_t line)
     : type(type), lexeme(std::move(lexeme)), literal(std::move(literal)), line(line) {}
 
 std::string Token::toString() const {

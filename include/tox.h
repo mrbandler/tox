@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
+#include <string_view>
 
 /**
  * Tox interpreter.
@@ -33,7 +35,7 @@ public:
      * @param msg Error message.
      *
      */
-    static void error(int line, const std::string& msg);
+    static void error(std::size_t line, std::string_view msg);
 
     /**
      * Reports an error at a specific line and location.
@@ -42,7 +44,7 @@ public:
      * @param where Location within the line.
      * @param msg Error message.
      */
-    static void report(int line, const std::string& where, const std::string& msg);
+    static void report(std::size_t line, std::string_view where, std::string_view msg);
 
 private:
     /**

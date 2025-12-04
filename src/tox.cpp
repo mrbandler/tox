@@ -64,10 +64,10 @@ void Tox::repl() {
     }
 }
 
-void Tox::error(int line, const std::string& msg) {
+void Tox::error(std::size_t line, std::string_view msg) {
     report(line, "", msg);
 }
 
-void Tox::report(int line, const std::string& where, const std::string& msg) {
+void Tox::report(std::size_t line, std::string_view where, std::string_view msg) {
     std::println(stderr, "[line {}] Error{}: {}", line, where, msg);
 }

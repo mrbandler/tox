@@ -16,11 +16,11 @@ public:
      *
      * @param source Source code to scan.
      */
-    Scanner(std::string source);
+    explicit Scanner(std::string source);
 
     /**
      * Scans the source code and returns a list of tokens.
-     * k
+     *
      * @return List of scanned tokens.
      */
     [[nodiscard]] std::vector<Token> scanTokens();
@@ -44,17 +44,17 @@ private:
     /**
      * Current starting position in the source code.
      */
-    int start = 0;
+    std::size_t start = 0;
 
     /**
      * Current position in the source code.
      */
-    int current = 0;
+    std::size_t current = 0;
 
     /**
      * Current line number in the source code.
      */
-    int line = 1;
+    std::size_t line = 1;
 
     /**
      * Scans a single token from the source code.
@@ -104,26 +104,26 @@ private:
      * @param expected Expected character to match.
      * @return True if the characters match, false otherwise.
      */
-    bool match(const char& expected);
+    [[nodiscard]] bool match(char expected);
 
     /**
      * Peeks at the current character without advancing the scanner.
      *
      * @return The current character in the source code.
      */
-    [[nodiscard]] char peek() const;
+    [[nodiscard]] char peek() const noexcept;
 
     /**
      * Peeks at the next character without advancing the scanner.
      *
      * @return The next character in the source code.
      */
-    [[nodiscard]] char peekNext() const;
+    [[nodiscard]] char peekNext() const noexcept;
 
     /**
      * Checks if the scanner has reached the end of the source code.
      */
-    [[nodiscard]] bool isAtEnd() const;
+    [[nodiscard]] bool isAtEnd() const noexcept;
 
     /**
      * Checks if a character is a digit.
@@ -131,7 +131,9 @@ private:
      * @param c Character to check.
      * @return True if the character is a digit, false otherwise.
      */
-    [[nodiscard]] bool isDigit(const char& c) const;
+    [[nodiscard]] static constexpr bool isDigit(char c) noexcept {
+        return c >= '0' && c <= '9';
+    }
 
     /**
      * Checks if a character is an alphabetic letter or underscore.
@@ -139,7 +141,9 @@ private:
      * @param c Character to check
      * @return True if the character is alphabetic or underscore, false otherwise.
      */
-    [[nodiscard]] bool isAlpha(const char& c) const;
+    [[nodiscard]] static constexpr bool isAlpha(char c) noexcept {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    }
 
     /**
      * Checks if a character is alphanumeric (letter or digit).
@@ -147,5 +151,7 @@ private:
      * @param c Character to check
      * @return True if the character is alphanumeric, false otherwise.
      */
-    [[nodiscard]] bool isAlphaNumeric(const char& c) const;
+    [[nodiscard]] static constexpr bool isAlphaNumeric(char c) noexcept {
+        return isAlpha(c) || isDigit(c);
+    }
 };

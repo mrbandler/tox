@@ -61,9 +61,7 @@ using Literal = std::variant<std::monostate, std::string, double>;
 /**
  * Token representation.
  */
-class Token {
-
-public:
+struct Token {
     /**
      * Type of the token.
      */
@@ -82,7 +80,7 @@ public:
     /**
      * Line number where the token appears.
      */
-    int line;
+    std::size_t line;
 
     /**
      * Default constructor.
@@ -92,10 +90,12 @@ public:
      * @param literal Literal value of the token.
      * @param line Line number where the token appears.
      */
-    Token(TokenType type, std::string lexeme, Literal literal, int line);
+    Token(TokenType type, std::string lexeme, Literal literal, std::size_t line);
 
     /**
      * Converts the token to a string representation.
+     *
+     * @return String representation of the token.
      */
     [[nodiscard]] std::string toString() const;
 };

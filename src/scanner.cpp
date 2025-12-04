@@ -171,7 +171,7 @@ char Scanner::advance() {
     return source[current++];
 }
 
-bool Scanner::match(const char& expected) {
+bool Scanner::match(char expected) {
     if (isAtEnd()) {
         return false;
     }
@@ -184,7 +184,7 @@ bool Scanner::match(const char& expected) {
     return true;
 }
 
-char Scanner::peek() const {
+char Scanner::peek() const noexcept {
     if (isAtEnd()) {
         return '\0';
     }
@@ -192,26 +192,14 @@ char Scanner::peek() const {
     return source[current];
 }
 
-char Scanner::peekNext() const {
-    if (current + 1 >= static_cast<int>(source.length())) {
+char Scanner::peekNext() const noexcept {
+    if (current + 1 >= source.length()) {
         return '\0';
     }
 
     return source[current + 1];
 }
 
-bool Scanner::isAtEnd() const {
-    return current >= static_cast<int>(source.length());
-}
-
-bool Scanner::isDigit(const char& c) const {
-    return c >= '0' && c <= '9';
-}
-
-bool Scanner::isAlpha(const char& c) const {
-    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
-}
-
-bool Scanner::isAlphaNumeric(const char& c) const {
-    return isAlpha(c) || isDigit(c);
+bool Scanner::isAtEnd() const noexcept {
+    return current >= source.length();
 }
