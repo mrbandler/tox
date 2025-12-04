@@ -1,0 +1,86 @@
+[
+  {
+    "label": "CMake: Configure (Debug)",
+    "command": "cmake",
+    "args": ["--preset", "default"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "CMake: Configure (Release)",
+    "command": "cmake",
+    "args": ["--preset", "release"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "CMake: Build (Debug)",
+    "command": "cmake",
+    "args": ["--build", "--preset", "default"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "tags": ["build"]
+  },
+  {
+    "label": "CMake: Build (Release)",
+    "command": "cmake",
+    "args": ["--build", "--preset", "release"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "tags": ["build"]
+  },
+  {
+    "label": "CMake: Clean (Debug)",
+    "command": "cmake",
+    "args": ["--build", "--preset", "default", "--target", "clean"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "CMake: Clean (Release)",
+    "command": "cmake",
+    "args": ["--build", "--preset", "release", "--target", "clean"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false
+  },
+  {
+    "label": "CMake: Rebuild (Debug)",
+    "command": "cmake",
+    "args": ["--build", "--preset", "default", "--clean-first"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "tags": ["build"]
+  },
+  {
+    "label": "CMake: Rebuild (Release)",
+    "command": "cmake",
+    "args": ["--build", "--preset", "release", "--clean-first"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "tags": ["build"]
+  },
+  {
+    "label": "Run: tox (Debug)",
+    "command": "$ZED_WORKTREE_ROOT/build/default/bin/tox.exe",
+    "args": [],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true
+  },
+  {
+    "label": "Run: tox (Release)",
+    "command": "$ZED_WORKTREE_ROOT/build/release/bin/tox.exe",
+    "args": [],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": true,
+    "allow_concurrent_runs": true
+  }
+]

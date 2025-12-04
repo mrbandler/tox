@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "name": "Debug tox (default)",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/default/bin/tox.exe",
+      "cwd": "${workspaceFolder}",
+      "adapter": "CodeLLDB",
+      "args": []
+    },
+    {
+      "name": "Debug tox (release)",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/release/bin/tox.exe",
+      "cwd": "${workspaceFolder}",
+      "adapter": "CodeLLDB",
+      "args": []
+    },
+    {
+      "name": "Debug tox with file",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/default/bin/tox.exe",
+      "cwd": "${workspaceFolder}",
+      "adapter": "CodeLLDB",
+      "args": ["${file}"]
+    }
+  ]
+}

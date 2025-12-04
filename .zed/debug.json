@@ -1,0 +1,54 @@
+[
+  {
+    "label": "Debug tox (default)",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "build/default/bin/tox.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [],
+    "build": {
+      "command": "cmake",
+      "args": ["--build", "--preset", "default"],
+      "cwd": "$ZED_WORKTREE_ROOT"
+    }
+  },
+  {
+    "label": "Debug tox (release)",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "build/release/bin/tox.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": [],
+    "build": {
+      "command": "cmake",
+      "args": ["--build", "--preset", "release"],
+      "cwd": "$ZED_WORKTREE_ROOT"
+    }
+  },
+  {
+    "label": "Debug tox with current file",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "build/default/bin/tox.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": ["$ZED_FILE"],
+    "build": {
+      "command": "cmake",
+      "args": ["--build", "--preset", "default"],
+      "cwd": "$ZED_WORKTREE_ROOT"
+    }
+  },
+  {
+    "label": "Debug tox with custom args",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "build/default/bin/tox.exe",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "args": ["$ARGS"],
+    "build": {
+      "command": "cmake",
+      "args": ["--build", "--preset", "default"],
+      "cwd": "$ZED_WORKTREE_ROOT"
+    }
+  }
+]
