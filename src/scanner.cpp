@@ -5,16 +5,16 @@
 
 #include <variant>
 
-Scanner::Scanner(std::string source) : source(std::move(source)) {}
+Scanner::Scanner(std::string source) : m_source(std::move(source)) {}
 
 std::vector<Token> Scanner::scanTokens() {
     while (!isAtEnd()) {
-        start = current;
+        m_start = m_current;
         scanToken();
     }
 
-    tokens.emplace_back(TokenType::END_OF_FILE, "", std::monostate{}, line);
-    return tokens;
+    m_tokens.emplace_back(TokenType::END_OF_FILE, "", std::monostate{}, m_line);
+    return m_tokens;
 }
 
 const std::unordered_map<std::string, TokenType> Scanner::keywords = {
@@ -87,7 +87,7 @@ void Scanner::scanToken() {
         // Ignore whitespace.
         break;
     case '\n':
-        line++;
+        m_line++;
         break;
     case '"':
         string();
@@ -98,7 +98,7 @@ void Scanner::scanToken() {
         } else if (isAlpha(c)) {
             identifier();
         } else {
-            Tox::error(line, "Unexpected character.");
+            Tox::error(m_line, "Unexpected character.");
         }
         break;
     }
@@ -110,21 +110,21 @@ void Scanner::addToken(TokenType type) {
 }
 
 void Scanner::addToken(TokenType type, const Literal& literal) {
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, literal, line);
+    std::string text = m_source.substr(m_start, m_current - m_start);
+    m_tokens.emplace_back(type, text, literal, m_line);
 }
 
 void Scanner::string() {
     while (peek() != '"' && !isAtEnd()) {
         if (peek() == '\n') {
-            line++;
+            m_line++;
         }
 
         advance();
     }
 
     if (isAtEnd()) {
-        Tox::error(line, "Unterminated string.");
+        Tox::error(m_line, "Unterminated string.");
 
         return;
     }
@@ -133,7 +133,7 @@ void Scanner::string() {
     advance();
 
     // Trim the surrounding quotes.
-    auto value = source.substr(start + 1, current - start - 2);
+    auto value = m_source.substr(m_start + 1, m_current - m_start - 2);
     addToken(TokenType::STRING, value);
 }
 
@@ -151,7 +151,7 @@ void Scanner::number() {
         }
     }
 
-    auto value = std::stod(source.substr(start, current - start));
+    auto value = std::stod(m_source.substr(m_start, m_current - m_start));
     addToken(TokenType::NUMBER, value);
 }
 
@@ -160,7 +160,7 @@ void Scanner::identifier() {
         advance();
     }
 
-    std::string text = source.substr(start, current - start);
+    std::string text = m_source.substr(m_start, m_current - m_start);
     auto it = keywords.find(text);
     TokenType type = (it != keywords.end()) ? it->second : TokenType::IDENTIFIER;
 
@@ -168,7 +168,7 @@ void Scanner::identifier() {
 }
 
 char Scanner::advance() {
-    return source[current++];
+    return m_source[m_current++];
 }
 
 bool Scanner::match(char expected) {
@@ -176,11 +176,11 @@ bool Scanner::match(char expected) {
         return false;
     }
 
-    if (source[current] != expected) {
+    if (m_source[m_current] != expected) {
         return false;
     }
 
-    current++;
+    m_current++;
     return true;
 }
 
@@ -189,17 +189,17 @@ char Scanner::peek() const noexcept {
         return '\0';
     }
 
-    return source[current];
+    return m_source[m_current];
 }
 
 char Scanner::peekNext() const noexcept {
-    if (current + 1 >= source.length()) {
+    if (m_current + 1 >= m_source.length()) {
         return '\0';
     }
 
-    return source[current + 1];
+    return m_source[m_current + 1];
 }
 
 bool Scanner::isAtEnd() const noexcept {
-    return current >= source.length();
+    return m_current >= m_source.length();
 }

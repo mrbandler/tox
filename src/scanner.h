@@ -34,27 +34,27 @@ private:
     /**
      * Source code to scan.
      */
-    const std::string source;
+    const std::string m_source;
 
     /**
      * List of scanned tokens.
      */
-    std::vector<Token> tokens;
+    std::vector<Token> m_tokens;
 
     /**
      * Current starting position in the source code.
      */
-    std::size_t start = 0;
+    std::size_t m_start = 0;
 
     /**
      * Current position in the source code.
      */
-    std::size_t current = 0;
+    std::size_t m_current = 0;
 
     /**
      * Current line number in the source code.
      */
-    std::size_t line = 1;
+    std::size_t m_line = 1;
 
     /**
      * Scans a single token from the source code.

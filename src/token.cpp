@@ -22,5 +22,5 @@ std::string Token::toString() const {
         },
         literal);
 
-    return std::format("{} {} {}", magic_enum::enum_name(type), lexeme, lit);
+    return std::format("Type: {} | Text: {} | Value: {}", magic_enum::enum_name(type), lexeme, lit);
 }

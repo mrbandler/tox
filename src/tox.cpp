@@ -21,7 +21,7 @@ void Tox::runFile(const std::string& path) {
 
     run(src);
 
-    if (hadError) {
+    if (m_hadError) {
         std::exit(65);
     }
 }
@@ -60,7 +60,7 @@ void Tox::repl() {
 
         run(line);
 
-        hadError = false;
+        m_hadError = false;
     }
 }
 

@@ -50,5 +50,5 @@ private:
     /**
      * Flag, whether an error has occurred.
      */
-    bool hadError = false;
+    bool m_hadError = false;
 };
