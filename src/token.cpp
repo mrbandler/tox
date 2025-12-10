@@ -16,6 +16,8 @@ std::string Token::toString() const {
                 return arg;
             } else if constexpr (std::is_same_v<T, double>) {
                 return std::to_string(arg);
+            } else if constexpr (std::is_same_v<T, bool>) {
+                return arg ? "true" : "false";
             } else {
                 return "unknown";
             }

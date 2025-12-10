@@ -1,5 +1,7 @@
 #pragma once
 
+#include "token.h"
+
 #include <cstddef>
 #include <string>
 #include <string_view>
@@ -36,6 +38,14 @@ public:
      *
      */
     static void error(std::size_t line, std::string_view msg);
+
+    /*
+     * Reports an error at a specific token.
+     *
+     * @param token Token where the error occurred.
+     * @param msg Error message.
+     */
+    static void error(const Token& token, std::string_view msg);
 
     /**
      * Reports an error at a specific line and location.

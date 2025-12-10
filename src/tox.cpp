@@ -1,5 +1,7 @@
 #include "tox.h"
 
+#include "ast.h"
+#include "parser.h"
 #include "scanner.h"
 
 #include <fstream>
@@ -31,9 +33,15 @@ void Tox::run(const std::string& src) {
     Scanner scanner(src);
     auto tokens = scanner.scanTokens();
 
-    for (const auto& token : tokens) {
-        std::println("{}", token.toString());
+    Parser parser = Parser(tokens);
+    auto expression = parser.parse();
+
+    if (m_hadError) {
+        return;
     }
+
+    ExprPrinter printer = ExprPrinter();
+    std::println("{}", printer.print(*expression));
 }
 
 void Tox::repl() {
@@ -66,6 +74,14 @@ void Tox::repl() {
 
 void Tox::error(std::size_t line, std::string_view msg) {
     report(line, "", msg);
+}
+
+void Tox::error(const Token& token, std::string_view msg) {
+    if (token.type == TokenType::END_OF_FILE) {
+        report(token.line, " at end", msg);
+    } else {
+        report(token.line, " at '" + token.lexeme + "'", msg);
+    }
 }
 
 void Tox::report(std::size_t line, std::string_view where, std::string_view msg) {

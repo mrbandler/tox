@@ -56,7 +56,7 @@ enum class TokenType : std::uint8_t {
     END_OF_FILE
 };
 
-using Literal = std::variant<std::monostate, std::string, double>;
+using Literal = std::variant<std::monostate, std::string, double, bool>;
 
 /**
  * Token representation.
