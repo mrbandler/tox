@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-std::string ExprPrinter::print(const Expr& expr) {
+[[nodiscard]] std::string ExprPrinter::print(const Expr& expr) {
     m_output.str("");
     m_output.clear();
     expr.accept(*this);
@@ -27,14 +27,20 @@ void ExprPrinter::visitGroupingExpr(const Grouping& expr) {
 }
 
 void ExprPrinter::visitLiteralExpr(const Lit& expr) {
-    const Literal& value = expr.value();
-    if (std::holds_alternative<std::monostate>(value)) {
-        m_output << "nil";
-    } else if (std::holds_alternative<std::string>(value)) {
-        m_output << std::get<std::string>(value);
-    } else if (std::holds_alternative<double>(value)) {
-        m_output << std::get<double>(value);
-    }
+    std::visit(
+        [this](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, std::monostate>) {
+                m_output << "nil";
+            } else if constexpr (std::is_same_v<T, std::string>) {
+                m_output << arg;
+            } else if constexpr (std::is_same_v<T, double>) {
+                m_output << arg;
+            } else if constexpr (std::is_same_v<T, bool>) {
+                m_output << (arg ? "true" : "false");
+            }
+        },
+        expr.value());
 }
 
 void ExprPrinter::visitUnaryExpr(const Unary& expr) {

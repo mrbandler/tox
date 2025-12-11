@@ -1,13 +1,13 @@
 #include "scanner.h"
 
-#include "token.h"
 #include "tox.h"
 
-#include <variant>
+#include <charconv>
+#include <string_view>
 
 Scanner::Scanner(std::string source) : m_source(std::move(source)) {}
 
-std::vector<Token> Scanner::scanTokens() {
+[[nodiscard]] std::vector<Token> Scanner::scanTokens() {
     while (!isAtEnd()) {
         m_start = m_current;
         scanToken();
@@ -17,7 +17,7 @@ std::vector<Token> Scanner::scanTokens() {
     return m_tokens;
 }
 
-const std::unordered_map<std::string, TokenType> Scanner::keywords = {
+const std::unordered_map<std::string, TokenType, StringHash, std::equal_to<>> Scanner::keywords = {
     {"and", TokenType::AND},   {"class", TokenType::CLASS}, {"else", TokenType::ELSE},     {"false", TokenType::FALSE},
     {"for", TokenType::FOR},   {"fun", TokenType::FUN},     {"if", TokenType::IF},         {"nil", TokenType::NIL},
     {"or", TokenType::OR},     {"print", TokenType::PRINT}, {"return", TokenType::RETURN}, {"super", TokenType::SUPER},
@@ -151,7 +151,8 @@ void Scanner::number() {
         }
     }
 
-    auto value = std::stod(m_source.substr(m_start, m_current - m_start));
+    double value = 0.0;
+    std::from_chars(m_source.data() + m_start, m_source.data() + m_current, value);
     addToken(TokenType::NUMBER, value);
 }
 
@@ -160,9 +161,8 @@ void Scanner::identifier() {
         advance();
     }
 
-    std::string text = m_source.substr(m_start, m_current - m_start);
-    auto it = keywords.find(text);
-    TokenType type = (it != keywords.end()) ? it->second : TokenType::IDENTIFIER;
+    std::string_view text(m_source.data() + m_start, m_current - m_start);
+    TokenType type = keywords.contains(text) ? keywords.find(text)->second : TokenType::IDENTIFIER;
 
     addToken(type);
 }

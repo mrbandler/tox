@@ -1,9 +1,10 @@
 #include "tox.h"
 
-#include "ast.h"
+#include "interpreter.h"
 #include "parser.h"
 #include "scanner.h"
 
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <print>
@@ -11,7 +12,18 @@
 #include <stdexcept>
 #include <string>
 
-void Tox::runFile(const std::string& path) {
+constexpr int EXIT_SUCCESS_CODE = 0;
+constexpr int EXIT_SYNTAX_ERROR = 65;
+constexpr int EXIT_RUNTIME_ERROR = 70;
+
+bool Tox::hadError = false;
+bool Tox::hadRuntimeError = false;
+
+Tox::Tox() : m_interpreter(std::make_unique<Interpreter>()) {}
+
+Tox::~Tox() = default;
+
+int Tox::runFile(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + path);
@@ -23,9 +35,15 @@ void Tox::runFile(const std::string& path) {
 
     run(src);
 
-    if (m_hadError) {
-        std::exit(65);
+    if (hadError) {
+        return EXIT_SYNTAX_ERROR;
     }
+
+    if (hadRuntimeError) {
+        return EXIT_RUNTIME_ERROR;
+    }
+
+    return EXIT_SUCCESS_CODE;
 }
 
 void Tox::run(const std::string& src) {
@@ -34,17 +52,16 @@ void Tox::run(const std::string& src) {
     auto tokens = scanner.scanTokens();
 
     Parser parser = Parser(tokens);
-    auto expression = parser.parse();
+    auto expr = parser.parse();
 
-    if (m_hadError) {
+    if (hadError) {
         return;
     }
 
-    ExprPrinter printer = ExprPrinter();
-    std::println("{}", printer.print(*expression));
+    m_interpreter->interpret(*expr);
 }
 
-void Tox::repl() {
+int Tox::repl() {
     std::println("Tox REPL");
     std::println("Type 'exit' or press Ctrl+C to quit.");
 
@@ -68,8 +85,10 @@ void Tox::repl() {
 
         run(line);
 
-        m_hadError = false;
+        hadError = false;
     }
+
+    return EXIT_SUCCESS_CODE;
 }
 
 void Tox::error(std::size_t line, std::string_view msg) {
@@ -80,8 +99,14 @@ void Tox::error(const Token& token, std::string_view msg) {
     if (token.type == TokenType::END_OF_FILE) {
         report(token.line, " at end", msg);
     } else {
-        report(token.line, " at '" + token.lexeme + "'", msg);
+        report(token.line, std::format(" at '{}'", token.lexeme), msg);
     }
+}
+
+void Tox::runtimeError(const RuntimeError& error) {
+    std::println(stderr, "{}\n[line {}]", error.what(), error.token().line);
+
+    hadRuntimeError = true;
 }
 
 void Tox::report(std::size_t line, std::string_view where, std::string_view msg) {

@@ -15,10 +15,8 @@ int main(int argc, char* argv[]) {
 
     Tox tox;
     if (!script.empty()) {
-        tox.runFile(script);
-    } else {
-        tox.repl();
+        return tox.runFile(script);
     }
 
-    return 0;
+    return tox.repl();
 }

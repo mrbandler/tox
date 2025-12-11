@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <variant>
 
@@ -56,6 +57,9 @@ enum class TokenType : std::uint8_t {
     END_OF_FILE
 };
 
+/**
+ * Literal value representation.
+ */
 using Literal = std::variant<std::monostate, std::string, double, bool>;
 
 /**

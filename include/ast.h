@@ -1,11 +1,12 @@
 #pragma once
+
 #include "token.h"
 
 #include <memory>
 #include <sstream>
 #include <string>
 
-// Forward declarations
+// Forward declarations.
 class Expr;
 class Binary;
 class Grouping;
@@ -70,11 +71,34 @@ public:
      * @param expr The expression to print.
      * @return The string representation of the expression.
      */
-    std::string print(const Expr& expr);
+    [[nodiscard]] std::string print(const Expr& expr);
 
+    /**
+     * Visit method for the binary expression type.
+     *
+     * @param expr The binary expression to visit.
+     */
     void visitBinaryExpr(const Binary& expr) override;
+
+    /**
+     * Visit method for the grouping expression type.
+     *
+     * @param expr The grouping expression to visit.
+     */
     void visitGroupingExpr(const Grouping& expr) override;
+
+    /**
+     * Visit method for the literal expression type.
+     *
+     * @param expr The literal expression to visit.
+     */
     void visitLiteralExpr(const Lit& expr) override;
+
+    /**
+     * Visit method for the unary expression type.
+     *
+     * @param expr The unary expression to visit.
+     */
     void visitUnaryExpr(const Unary& expr) override;
 };
 
@@ -137,7 +161,7 @@ public:
      *
      * @return The left operand expression.
      */
-    [[nodiscard]] const Expr& left() const {
+    [[nodiscard]] const Expr& left() const noexcept {
         return *m_left;
     }
 
@@ -146,7 +170,7 @@ public:
      *
      * @return The operator token.
      */
-    [[nodiscard]] const Token& op() const {
+    [[nodiscard]] const Token& op() const noexcept {
         return m_op;
     }
 
@@ -155,7 +179,7 @@ public:
      *
      * @return The right operand expression.
      */
-    [[nodiscard]] const Expr& right() const {
+    [[nodiscard]] const Expr& right() const noexcept {
         return *m_right;
     }
 
@@ -185,14 +209,14 @@ public:
      *
      * @param expression The expression to be grouped.
      */
-    Grouping(ExprPtr expression) : m_expression(std::move(expression)) {}
+    explicit Grouping(ExprPtr expression) : m_expression(std::move(expression)) {}
 
     /**
      * Get the contained expression.
      *
      * @return The contained expression.
      */
-    [[nodiscard]] const Expr& expression() const {
+    [[nodiscard]] const Expr& expression() const noexcept {
         return *m_expression;
     }
 
@@ -220,14 +244,14 @@ public:
     /**
      * Constructor for the Literal expression.
      */
-    Lit(Literal value) : m_value(std::move(value)) {}
+    explicit Lit(Literal value) : m_value(std::move(value)) {}
 
     /**
      * Get the literal value.
      *
      * @return The literal value.
      */
-    [[nodiscard]] const Literal& value() const {
+    [[nodiscard]] const Literal& value() const noexcept {
         return m_value;
     }
 
@@ -258,7 +282,7 @@ private:
 
 public:
     /**
-     *   * Constructor for the Unary expression.
+     * Constructor for the Unary expression.
      *
      * @param op    The operator token.
      * @param right The operand expression.
@@ -270,7 +294,7 @@ public:
      *
      * @return The operator token.
      */
-    [[nodiscard]] const Token& op() const {
+    [[nodiscard]] const Token& op() const noexcept {
         return m_op;
     }
 
@@ -279,7 +303,7 @@ public:
      *
      * @return The operand expression.
      */
-    [[nodiscard]] const Expr& right() const {
+    [[nodiscard]] const Expr& right() const noexcept {
         return *m_right;
     }
 

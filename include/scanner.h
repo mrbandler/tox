@@ -2,14 +2,42 @@
 
 #include "token.h"
 
+#include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
+
+/**
+ * Transparent hash functor for string_view lookups in unordered_map.
+ */
+struct StringHash {
+    using is_transparent = void;
+
+    /**
+     * Hash function for std::string_view.
+     *
+     * @param sv The string view to hash.
+     * @return The hash value.
+     */
+    [[nodiscard]] std::size_t operator()(std::string_view sv) const noexcept {
+        return std::hash<std::string_view>{}(sv);
+    }
+
+    /**
+     * Hash function for std::string.
+     *
+     * @param s The string to hash.
+     * @return The hash value.
+     */
+    [[nodiscard]] std::size_t operator()(const std::string& s) const noexcept {
+        return std::hash<std::string_view>{}(s);
+    }
+};
 
 /**
  * Scanner for source code.
  */
 class Scanner {
-
 public:
     /**
      * Default constructor.
@@ -28,8 +56,9 @@ public:
 private:
     /**
      * Mapping of keywords to their corresponding token types.
+     * Uses transparent hash for efficient string_view lookups.
      */
-    static const std::unordered_map<std::string, TokenType> keywords;
+    static const std::unordered_map<std::string, TokenType, StringHash, std::equal_to<>> keywords;
 
     /**
      * Source code to scan.

@@ -1,15 +1,33 @@
 #include "parser.h"
 
-#include "ast.h"
-#include "token.h"
+#include "tox.h"
 
-#include <algorithm>
+[[nodiscard]] ExprPtr Parser::parse() {
+    try {
+        return expression();
+    } catch (const ParseError& error) {
+        return nullptr;
+    }
+}
+
+const Token& Parser::consume(TokenType type, const std::string& msg) {
+    if (check(type)) {
+        return advance();
+    }
+
+    throw error(peek(), msg);
+}
+
+ParseError Parser::error(const Token& token, const std::string& msg) {
+    Tox::error(token, msg);
+
+    return ParseError(msg);
+}
 
 ExprPtr Parser::equality() {
     auto expr = comparison();
 
-    std::vector<TokenType> types = {TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL};
-    while (match(types)) {
+    while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
         auto op = previous();
         auto right = comparison();
         expr = std::make_unique<Binary>(std::move(expr), std::move(op), std::move(right));
@@ -21,9 +39,7 @@ ExprPtr Parser::equality() {
 ExprPtr Parser::comparison() {
     auto expr = term();
 
-    std::vector<TokenType> types = {TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS,
-                                    TokenType::LESS_EQUAL};
-    while (match(types)) {
+    while (match(TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL)) {
         auto op = previous();
         auto right = term();
         expr = std::make_unique<Binary>(std::move(expr), std::move(op), std::move(right));
@@ -35,8 +51,7 @@ ExprPtr Parser::comparison() {
 ExprPtr Parser::term() {
     auto expr = factor();
 
-    std::vector<TokenType> types = {TokenType::MINUS, TokenType::PLUS};
-    while (match(types)) {
+    while (match(TokenType::MINUS, TokenType::PLUS)) {
         auto op = previous();
         auto right = factor();
         expr = std::make_unique<Binary>(std::move(expr), std::move(op), std::move(right));
@@ -48,8 +63,7 @@ ExprPtr Parser::term() {
 ExprPtr Parser::factor() {
     auto expr = unary();
 
-    std::vector<TokenType> types = {TokenType::SLASH, TokenType::STAR};
-    while (match(types)) {
+    while (match(TokenType::SLASH, TokenType::STAR)) {
         auto op = previous();
         auto right = unary();
         expr = std::make_unique<Binary>(std::move(expr), std::move(op), std::move(right));
@@ -59,8 +73,7 @@ ExprPtr Parser::factor() {
 }
 
 ExprPtr Parser::unary() {
-    std::vector<TokenType> types = {TokenType::BANG, TokenType::MINUS};
-    if (match(types)) {
+    if (match(TokenType::BANG, TokenType::MINUS)) {
         auto op = previous();
         auto right = unary();
         return std::make_unique<Unary>(std::move(op), std::move(right));
@@ -70,19 +83,19 @@ ExprPtr Parser::unary() {
 }
 
 ExprPtr Parser::primary() {
-    if (match({TokenType::FALSE})) {
+    if (match(TokenType::FALSE)) {
         return std::make_unique<Lit>(Literal(false));
     }
-    if (match({TokenType::TRUE})) {
+    if (match(TokenType::TRUE)) {
         return std::make_unique<Lit>(Literal(true));
     }
-    if (match({TokenType::NIL})) {
+    if (match(TokenType::NIL)) {
         return std::make_unique<Lit>(Literal(std::monostate{}));
     }
-    if (match({TokenType::NUMBER, TokenType::STRING})) {
+    if (match(TokenType::NUMBER, TokenType::STRING)) {
         return std::make_unique<Lit>(previous().literal);
     }
-    if (match({TokenType::LEFT_PAREN})) {
+    if (match(TokenType::LEFT_PAREN)) {
         auto expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
         return std::make_unique<Grouping>(std::move(expr));
@@ -115,13 +128,4 @@ void Parser::synchronize() {
 
         advance();
     }
-}
-
-bool Parser::match(const std::vector<TokenType>& types) {
-    if (std::ranges::any_of(types, [this](const auto& type) { return check(type); })) {
-        advance();
-        return true;
-    }
-
-    return false;
 }
